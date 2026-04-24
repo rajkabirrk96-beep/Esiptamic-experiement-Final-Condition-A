@@ -5,9 +5,6 @@ from datetime import datetime
 app = Flask(__name__)
 app.secret_key = 'epistemic_alignment_conditionA_2024'
 
-# ── 30 UNIQUE COMPANY NAMES — never repeated ─────────────────────────────────
-# 2 unique companies per round × 15 rounds = 30 total
-
 ALL_ROUNDS = {
     "Information Technology": [
         (1,  "Nexora Systems",    142.50, 3.8,  1.5, "Dataflux Inc",      87.20,  2.1,  1.8),
@@ -102,7 +99,7 @@ ALL_ROUNDS = {
         (5,  "FoodNexus Inc",     150.30, 10.1, 2.0, "GroceryVault Corp", 182.80, 3.6,  1.7),
         (6,  "StapleBridge Ltd",  195.20, 4.6,  1.9, "HouseholdCore Inc", 184.90, 9.8,  2.2),
         (7,  "FoodVault Corp",    239.80, 7.3,  1.6, "GroceryLink Ltd",   153.10, 3.9,  2.0),
-        (8,  "StapleCore Inc",    187.30, 9.4,  1.8, "HouseholdStream Corp",198.00,4.7, 1.7),
+        (8,  "StapleCore Inc",    187.30, 9.4,  1.8, "HouseholdStream Corp",198.00,4.7,1.7),
         (9,  "FoodPath Ltd",      156.40, 3.7,  2.1, "GroceryStream Inc", 242.60, 10.6, 1.9),
         (10, "StapleNexus Corp",  201.20, 8.2,  1.7, "HouseholdVault Ltd",190.10, 4.1,  2.0),
         (11, "FoodCore Inc",      192.60, 4.9,  1.9, "GroceryPath Corp",  159.20, 9.7,  2.1),
@@ -112,94 +109,93 @@ ALL_ROUNDS = {
         (15, "FoodStream Ltd",    198.10, 4.4,  1.8, "GroceryNova Inc",   165.80, 10.8, 2.3),
     ],
     "Industrials": [
-        (1,  "AeroNexus Corp",    287.40, 9.1,  1.7, "ManufactureCore Ltd",198.60,3.8,  2.0),
-        (2,  "TransportStream Inc",156.80,4.6,  1.9, "IndustryVault Corp",234.20, 10.3, 1.8),
-        (3,  "BuildNexus Ltd",    312.50, 3.7,  2.1, "AeroBridge Corp",   291.30, 9.7,  1.7),
-        (4,  "ManufactureLink Inc",201.40,8.4,  1.6, "TransportCore Ltd", 159.60, 4.1,  2.2),
-        (5,  "IndustryStream Corp",237.80,10.6, 2.0, "BuildCore Inc",     309.20, 3.5,  1.9),
-        (6,  "AeroVault Ltd",     294.80, 4.8,  1.8, "ManufactureNexus Corp",241.30,9.2,2.1),
-        (7,  "TransportBridge Inc",162.40,7.3,  1.7, "IndustryCore Ltd",  204.80, 4.6,  1.9),
-        (8,  "BuildStream Corp",  306.80, 9.8,  2.2, "AeroLink Inc",      244.60, 3.7,  1.8),
-        (9,  "ManufactureVault Ltd",298.20,4.2, 1.9, "TransportNexus Corp",165.30,10.4, 2.0),
-        (10, "IndustryBridge Inc",208.20, 8.7,  1.7, "BuildVault Ltd",    304.50, 4.9,  2.1),
-        (11, "AeroStream Corp",   247.80, 3.9,  2.0, "ManufactureCore Inc",302.10,9.6,  1.8),
-        (12, "TransportVault Ltd",168.20, 10.1, 1.9, "IndustryLink Corp", 211.60, 3.4,  2.2),
-        (13, "BuildBridge Inc",   302.30, 4.7,  1.8, "AeroCore Ltd",      251.20, 8.9,  1.7),
-        (14, "ManufactureStream Corp",305.90,9.3,1.7,"TransportLink Inc", 171.50, 4.2,  2.0),
-        (15, "IndustryNexus Ltd", 215.00, 3.8,  2.1, "BuildStream Corp",  300.10, 10.7, 1.9),
+        (1,  "AeroNexus Corp",    287.40, 9.1, 1.7, "ManufactureCore Ltd", 198.60, 3.8, 2.0),
+        (2,  "TransportStream Inc",156.80,4.6, 1.9, "IndustryVault Corp",  234.20,10.3, 1.8),
+        (3,  "BuildNexus Ltd",    312.50, 3.7, 2.1, "AeroBridge Corp",     291.30, 9.7, 1.7),
+        (4,  "ManufactureLink Inc",201.40,8.4, 1.6, "TransportCore Ltd",   159.60, 4.1, 2.2),
+        (5,  "IndustryStream Corp",237.80,10.6,2.0, "BuildCore Inc",       309.20, 3.5, 1.9),
+        (6,  "AeroVault Ltd",     294.80, 4.8, 1.8, "ManufactureNexus Corp",241.30,9.2, 2.1),
+        (7,  "TransportBridge Inc",162.40,7.3, 1.7, "IndustryCore Ltd",    204.80, 4.6, 1.9),
+        (8,  "BuildStream Corp",  306.80, 9.8, 2.2, "AeroLink Inc",        244.60, 3.7, 1.8),
+        (9,  "ManufactureVault Ltd",298.20,4.2,1.9, "TransportNexus Corp", 165.30,10.4, 2.0),
+        (10, "IndustryBridge Inc",208.20, 8.7, 1.7, "BuildVault Ltd",      304.50, 4.9, 2.1),
+        (11, "AeroStream Corp",   247.80, 3.9, 2.0, "ManufactureCore Inc", 302.10, 9.6, 1.8),
+        (12, "TransportVault Ltd",168.20,10.1, 1.9, "IndustryLink Corp",   211.60, 3.4, 2.2),
+        (13, "BuildBridge Inc",   302.30, 4.7, 1.8, "AeroCore Ltd",        251.20, 8.9, 1.7),
+        (14, "ManufactureStream Corp",305.90,9.3,1.7,"TransportLink Inc",  171.50, 4.2, 2.0),
+        (15, "IndustryNexus Ltd", 215.00, 3.8, 2.1, "BuildStream Corp",    300.10,10.7, 1.9),
     ],
     "Materials": [
-        (1,  "ChemNexus Corp",    156.40, 8.6,  1.8, "MiningCore Ltd",    234.80, 3.9,  2.1),
-        (2,  "PackageStream Inc", 89.30,  4.3,  1.9, "MaterialVault Corp",178.60, 10.2, 1.7),
-        (3,  "ChemBridge Ltd",    158.90, 3.7,  2.0, "MiningLink Inc",    92.10,  9.4,  2.2),
-        (4,  "PackageCore Corp",  237.60, 9.1,  1.7, "MaterialStream Ltd",181.40, 4.6,  1.9),
-        (5,  "ChemVault Inc",     94.80,  10.5, 2.1, "MiningVault Corp",  161.40, 3.8,  1.8),
-        (6,  "PackageNexus Ltd",  184.20, 4.8,  1.9, "MaterialCore Inc",  163.80, 9.7,  2.0),
-        (7,  "ChemStream Corp",   240.40, 7.9,  1.7, "MiningBridge Ltd",  97.60,  4.1,  2.3),
-        (8,  "PackageBridge Inc", 166.20, 9.3,  2.0, "MaterialLink Corp", 187.00, 3.6,  1.8),
-        (9,  "ChemCore Ltd",      100.30, 4.5,  1.8, "MiningStream Inc",  243.20, 10.8, 2.1),
-        (10, "PackagePath Corp",  189.80, 8.7,  1.9, "MaterialBridge Ltd",168.90, 4.3,  1.7),
-        (11, "ChemLink Inc",      171.60, 3.9,  2.2, "MiningCore Corp",   103.10, 9.6,  2.0),
-        (12, "PackageVault Ltd",  246.30, 10.4, 1.8, "MaterialNexus Inc", 193.00, 4.8,  1.9),
-        (13, "ChemPath Corp",     105.80, 4.2,  1.7, "MiningLink Ltd",    174.30, 8.3,  2.1),
-        (14, "PackageStream Inc", 196.40, 9.8,  2.0, "MaterialCore Corp", 249.80, 3.7,  1.8),
-        (15, "ChemNova Ltd",      177.20, 3.6,  1.9, "MiningVault Inc",   108.60, 10.9, 2.2),
+        (1,  "ChemNexus Corp",    156.40, 8.6, 1.8, "MiningCore Ltd",     234.80, 3.9, 2.1),
+        (2,  "PackageStream Inc",  89.30, 4.3, 1.9, "MaterialVault Corp", 178.60,10.2, 1.7),
+        (3,  "ChemBridge Ltd",    158.90, 3.7, 2.0, "MiningLink Inc",      92.10, 9.4, 2.2),
+        (4,  "PackageCore Corp",  237.60, 9.1, 1.7, "MaterialStream Ltd", 181.40, 4.6, 1.9),
+        (5,  "ChemVault Inc",      94.80,10.5, 2.1, "MiningVault Corp",   161.40, 3.8, 1.8),
+        (6,  "PackageNexus Ltd",  184.20, 4.8, 1.9, "MaterialCore Inc",   163.80, 9.7, 2.0),
+        (7,  "ChemStream Corp",   240.40, 7.9, 1.7, "MiningBridge Ltd",    97.60, 4.1, 2.3),
+        (8,  "PackageBridge Inc", 166.20, 9.3, 2.0, "MaterialLink Corp",  187.00, 3.6, 1.8),
+        (9,  "ChemCore Ltd",      100.30, 4.5, 1.8, "MiningStream Inc",   243.20,10.8, 2.1),
+        (10, "PackagePath Corp",  189.80, 8.7, 1.9, "MaterialBridge Ltd", 168.90, 4.3, 1.7),
+        (11, "ChemLink Inc",      171.60, 3.9, 2.2, "MiningCore Corp",    103.10, 9.6, 2.0),
+        (12, "PackageVault Ltd",  246.30,10.4, 1.8, "MaterialNexus Inc",  193.00, 4.8, 1.9),
+        (13, "ChemPath Corp",     105.80, 4.2, 1.7, "MiningLink Ltd",     174.30, 8.3, 2.1),
+        (14, "PackageStream Inc", 196.40, 9.8, 2.0, "MaterialCore Corp",  249.80, 3.7, 1.8),
+        (15, "ChemNova Ltd",      177.20, 3.6, 1.9, "MiningVault Inc",    108.60,10.9, 2.2),
     ],
     "Real Estate": [
-        (1,  "PropNexus Corp",    234.60, 4.7,  1.6, "REITStream Ltd",    312.80, 9.3,  1.9),
-        (2,  "EstateCore Inc",    178.30, 9.8,  1.8, "PropertyVault Corp",156.40, 3.6,  2.1),
-        (3,  "PropBridge Ltd",    237.40, 3.5,  2.0, "REITCore Inc",      181.60, 10.7, 1.7),
-        (4,  "EstateStream Corp", 316.20, 8.4,  1.7, "PropertyLink Ltd",  159.30, 4.2,  2.2),
-        (5,  "PropVault Inc",     184.90, 10.2, 2.1, "REITBridge Corp",   240.20, 3.8,  1.8),
-        (6,  "EstateLink Ltd",    162.10, 4.6,  1.9, "PropertyCore Inc",  243.10, 9.6,  2.0),
-        (7,  "PropStream Corp",   319.80, 7.8,  1.7, "REITVault Ltd",     188.30, 4.1,  2.3),
-        (8,  "EstateNexus Inc",   246.20, 9.4,  2.0, "PropertyStream Corp",165.00,3.7,  1.8),
-        (9,  "PropCore Ltd",      191.60, 3.9,  1.8, "REITLink Inc",      323.40, 10.4, 2.1),
-        (10, "EstateBridge Corp", 167.80, 8.9,  1.9, "PropertyNexus Ltd", 249.30, 4.5,  1.7),
-        (11, "PropLink Inc",      252.40, 4.3,  2.2, "REITCore Corp",     195.00, 9.8,  2.0),
-        (12, "EstateVault Ltd",   327.20, 10.6, 1.7, "PropertyBridge Inc",170.60, 3.5,  1.9),
-        (13, "PropStream Corp",   198.30, 4.8,  1.8, "REITPath Ltd",      255.60, 8.7,  2.1),
-        (14, "EstateCore Inc",    173.40, 9.1,  2.0, "PropertyVault Corp",331.40, 4.2,  1.8),
-        (15, "PropNova Ltd",      258.90, 3.7,  1.9, "REITStream Inc",    201.80, 10.3, 2.2),
+        (1,  "PropNexus Corp",    234.60, 4.7, 1.6, "REITStream Ltd",     312.80, 9.3, 1.9),
+        (2,  "EstateCore Inc",    178.30, 9.8, 1.8, "PropertyVault Corp", 156.40, 3.6, 2.1),
+        (3,  "PropBridge Ltd",    237.40, 3.5, 2.0, "REITCore Inc",       181.60,10.7, 1.7),
+        (4,  "EstateStream Corp", 316.20, 8.4, 1.7, "PropertyLink Ltd",   159.30, 4.2, 2.2),
+        (5,  "PropVault Inc",     184.90,10.2, 2.1, "REITBridge Corp",    240.20, 3.8, 1.8),
+        (6,  "EstateLink Ltd",    162.10, 4.6, 1.9, "PropertyCore Inc",   243.10, 9.6, 2.0),
+        (7,  "PropStream Corp",   319.80, 7.8, 1.7, "REITVault Ltd",      188.30, 4.1, 2.3),
+        (8,  "EstateNexus Inc",   246.20, 9.4, 2.0, "PropertyStream Corp",165.00, 3.7, 1.8),
+        (9,  "PropCore Ltd",      191.60, 3.9, 1.8, "REITLink Inc",       323.40,10.4, 2.1),
+        (10, "EstateBridge Corp", 167.80, 8.9, 1.9, "PropertyNexus Ltd",  249.30, 4.5, 1.7),
+        (11, "PropLink Inc",      252.40, 4.3, 2.2, "REITCore Corp",      195.00, 9.8, 2.0),
+        (12, "EstateVault Ltd",   327.20,10.6, 1.7, "PropertyBridge Inc", 170.60, 3.5, 1.9),
+        (13, "PropStream Corp",   198.30, 4.8, 1.8, "REITPath Ltd",       255.60, 8.7, 2.1),
+        (14, "EstateCore Inc",    173.40, 9.1, 2.0, "PropertyVault Corp", 331.40, 4.2, 1.8),
+        (15, "PropNova Ltd",      258.90, 3.7, 1.9, "REITStream Inc",     201.80,10.3, 2.2),
     ],
     "Utilities": [
-        (1,  "PowerNexus Corp",   134.60, 4.3,  1.4, "UtilityStream Ltd", 189.30, 9.1,  1.7),
-        (2,  "ElectricCore Inc",  98.40,  9.6,  1.6, "GasVault Corp",     156.80, 3.8,  1.9),
-        (3,  "PowerBridge Ltd",   136.80, 3.7,  1.5, "UtilityCore Inc",   100.90, 10.4, 1.8),
-        (4,  "ElectricStream Corp",192.10,8.2,  1.7, "GasLink Ltd",       159.40, 4.1,  2.0),
-        (5,  "PowerVault Inc",    103.40, 10.1, 1.9, "UtilityBridge Corp",139.20, 3.6,  1.6),
-        (6,  "ElectricLink Ltd",  162.10, 4.6,  1.6, "GasCore Inc",       141.60, 9.7,  1.8),
-        (7,  "PowerStream Corp",  195.00, 7.4,  1.5, "UtilityVault Ltd",  105.90, 4.2,  1.9),
-        (8,  "ElectricNexus Inc", 144.10, 9.3,  1.7, "GasStream Corp",    164.80, 3.9,  2.1),
-        (9,  "PowerCore Ltd",     108.40, 4.8,  1.8, "UtilityLink Inc",   197.90, 10.6, 1.7),
-        (10, "ElectricVault Corp",167.60, 8.7,  1.6, "GasNexus Ltd",      146.80, 4.3,  1.9),
-        (11, "PowerLink Inc",     149.50, 3.9,  1.7, "UtilityCore Corp",  110.90, 9.4,  2.0),
-        (12, "ElectricBridge Ltd",200.80, 10.2, 1.5, "GasVault Inc",      170.40, 4.7,  1.8),
-        (13, "PowerStream Corp",  113.40, 4.4,  1.9, "UtilityNexus Ltd",  152.20, 8.8,  1.7),
-        (14, "ElectricPath Inc",  173.20, 9.8,  1.6, "GasBridge Corp",    203.70, 3.6,  2.0),
-        (15, "PowerNova Ltd",     155.00, 3.7,  1.8, "UtilityStream Inc", 115.90, 10.7, 1.9),
+        (1,  "PowerNexus Corp",   134.60, 4.3, 1.4, "UtilityStream Ltd",  189.30, 9.1, 1.7),
+        (2,  "ElectricCore Inc",   98.40, 9.6, 1.6, "GasVault Corp",      156.80, 3.8, 1.9),
+        (3,  "PowerBridge Ltd",   136.80, 3.7, 1.5, "UtilityCore Inc",    100.90,10.4, 1.8),
+        (4,  "ElectricStream Corp",192.10,8.2, 1.7, "GasLink Ltd",        159.40, 4.1, 2.0),
+        (5,  "PowerVault Inc",    103.40,10.1, 1.9, "UtilityBridge Corp", 139.20, 3.6, 1.6),
+        (6,  "ElectricLink Ltd",  162.10, 4.6, 1.6, "GasCore Inc",        141.60, 9.7, 1.8),
+        (7,  "PowerStream Corp",  195.00, 7.4, 1.5, "UtilityVault Ltd",   105.90, 4.2, 1.9),
+        (8,  "ElectricNexus Inc", 144.10, 9.3, 1.7, "GasStream Corp",     164.80, 3.9, 2.1),
+        (9,  "PowerCore Ltd",     108.40, 4.8, 1.8, "UtilityLink Inc",    197.90,10.6, 1.7),
+        (10, "ElectricVault Corp",167.60, 8.7, 1.6, "GasNexus Ltd",       146.80, 4.3, 1.9),
+        (11, "PowerLink Inc",     149.50, 3.9, 1.7, "UtilityCore Corp",   110.90, 9.4, 2.0),
+        (12, "ElectricBridge Ltd",200.80,10.2, 1.5, "GasVault Inc",       170.40, 4.7, 1.8),
+        (13, "PowerStream Corp",  113.40, 4.4, 1.9, "UtilityNexus Ltd",   152.20, 8.8, 1.7),
+        (14, "ElectricPath Inc",  173.20, 9.8, 1.6, "GasBridge Corp",     203.70, 3.6, 2.0),
+        (15, "PowerNova Ltd",     155.00, 3.7, 1.8, "UtilityStream Inc",  115.90,10.7, 1.9),
     ],
     "Communication Services": [
-        (1,  "MediaNexus Corp",   267.40, 9.4,  1.8, "TelecomCore Ltd",   198.60, 3.7,  2.1),
-        (2,  "StreamVault Inc",   134.80, 4.1,  1.9, "CommBridge Corp",   312.40, 10.2, 1.7),
-        (3,  "MediaCore Ltd",     270.20, 3.6,  2.0, "TelecomStream Inc", 137.60, 9.8,  2.2),
-        (4,  "StreamLink Corp",   201.40, 8.7,  1.7, "CommVault Ltd",     315.80, 4.3,  1.9),
-        (5,  "MediaBridge Inc",   140.50, 10.3, 2.1, "TelecomNexus Corp", 273.10, 3.8,  1.8),
-        (6,  "StreamCore Ltd",    319.20, 4.8,  1.8, "CommStream Inc",    276.00, 9.6,  2.0),
-        (7,  "MediaVault Corp",   204.30, 7.6,  1.7, "TelecomLink Ltd",   143.40, 4.1,  2.3),
-        (8,  "StreamNexus Inc",   278.90, 9.2,  2.0, "CommCore Corp",     322.60, 3.9,  1.8),
-        (9,  "MediaLink Ltd",     146.30, 4.4,  1.9, "TelecomVault Inc",  207.20, 10.7, 2.1),
-        (10, "StreamBridge Corp", 326.00, 8.8,  1.7, "CommNexus Ltd",     281.80, 4.6,  1.9),
-        (11, "MediaStream Inc",   284.70, 3.7,  2.2, "TelecomCore Corp",  149.20, 9.3,  2.0),
-        (12, "StreamVault Ltd",   210.10, 10.4, 1.8, "CommLink Inc",      329.40, 4.8,  1.7),
-        (13, "MediaNova Corp",    152.10, 4.2,  1.9, "TelecomBridge Ltd", 287.60, 8.7,  2.1),
-        (14, "StreamCore Inc",    332.80, 9.7,  1.7, "CommVault Corp",    213.40, 3.5,  1.9),
-        (15, "MediaPath Ltd",     290.50, 3.9,  2.0, "TelecomStream Corp",155.00, 10.8, 2.2),
+        (1,  "MediaNexus Corp",   267.40, 9.4, 1.8, "TelecomCore Ltd",    198.60, 3.7, 2.1),
+        (2,  "StreamVault Inc",   134.80, 4.1, 1.9, "CommBridge Corp",    312.40,10.2, 1.7),
+        (3,  "MediaCore Ltd",     270.20, 3.6, 2.0, "TelecomStream Inc",  137.60, 9.8, 2.2),
+        (4,  "StreamLink Corp",   201.40, 8.7, 1.7, "CommVault Ltd",      315.80, 4.3, 1.9),
+        (5,  "MediaBridge Inc",   140.50,10.3, 2.1, "TelecomNexus Corp",  273.10, 3.8, 1.8),
+        (6,  "StreamCore Ltd",    319.20, 4.8, 1.8, "CommStream Inc",     276.00, 9.6, 2.0),
+        (7,  "MediaVault Corp",   204.30, 7.6, 1.7, "TelecomLink Ltd",    143.40, 4.1, 2.3),
+        (8,  "StreamNexus Inc",   278.90, 9.2, 2.0, "CommCore Corp",      322.60, 3.9, 1.8),
+        (9,  "MediaLink Ltd",     146.30, 4.4, 1.9, "TelecomVault Inc",   207.20,10.7, 2.1),
+        (10, "StreamBridge Corp", 326.00, 8.8, 1.7, "CommNexus Ltd",      281.80, 4.6, 1.9),
+        (11, "MediaStream Inc",   284.70, 3.7, 2.2, "TelecomCore Corp",   149.20, 9.3, 2.0),
+        (12, "StreamVault Ltd",   210.10,10.4, 1.8, "CommLink Inc",       329.40, 4.8, 1.7),
+        (13, "MediaNova Corp",    152.10, 4.2, 1.9, "TelecomBridge Ltd",  287.60, 8.7, 2.1),
+        (14, "StreamCore Inc",    332.80, 9.7, 1.7, "CommVault Corp",     213.40, 3.5, 1.9),
+        (15, "MediaPath Ltd",     290.50, 3.9, 2.0, "TelecomStream Corp", 155.00,10.8, 2.2),
     ],
 }
 
 def generate_trajectory(start_price, growth_6m_pct, volatility, seed):
-    """Generate 126 daily prices using GBM model"""
     import random
     random.seed(seed)
     days = 126
@@ -298,8 +294,7 @@ def save_response(data):
 
 def calc_feedback(rd, start_r, end_r):
     allocs,confs,acis=[],[],[]
-    rounds_detail=[]
-    chart_data=[]
+    rounds_detail=[]; chart_data=[]
     for r in range(start_r, end_r+1):
         alloc=float(rd.get(f'R{r}_alloc',50))
         conf=float(rd.get(f'R{r}_conf',50))
@@ -328,8 +323,7 @@ def calc_final(sector, rd):
         rnd=row[0]
         alloc=float(rd.get(f'R{rnd}_alloc',50))
         conf=float(rd.get(f'R{rnd}_conf',50))
-        growth_a=row[3]; growth_b=row[6]
-        ra=growth_a/100; rb=growth_b/100
+        ra=row[3]/100; rb=row[6]/100
         aa=alloc*10; ab=1000-aa
         actual=(aa*ra)+(ab*rb); bench=(500*ra)+(500*rb)
         total_return+=actual; benchmark_return+=bench
@@ -348,8 +342,6 @@ def calc_final(sector, rd):
         "mean_aci":round(sum(acis)/len(acis),3) if acis else 0,
         "correct_rounds":correct,
     }
-
-# ── ROUTES ────────────────────────────────────────────────────────────────────
 
 @app.route('/')
 def index():
@@ -387,8 +379,8 @@ def round_page(rnd):
     sector=session.get('sector','Information Technology')
     row=ALL_ROUNDS.get(sector,ALL_ROUNDS["Information Technology"])[rnd-1]
     rnd_num,sa,pa,ga,va,sb,pb,gb,vb=row
-    change_a,end_a=get_final_change(pa,ga)
-    change_b,end_b=get_final_change(pb,gb)
+    change_a,_=get_final_change(pa,ga)
+    change_b,_=get_final_change(pb,gb)
     rd=session.get('rd',{})
     ai_text=build_ai_text(rnd,sa,sb,
         session.get('investment_goal',''),
@@ -398,8 +390,7 @@ def round_page(rnd):
     traj_a=generate_trajectory(pa,ga,va,seed=rnd*100+1)
     traj_b=generate_trajectory(pb,gb,vb,seed=rnd*100+2)
     return render_template('round.html',
-        rnd=rnd,sa=sa,sb=sb,
-        pa=pa,pb=pb,
+        rnd=rnd,sa=sa,sb=sb,pa=pa,pb=pb,
         change_a=change_a,change_b=change_b,
         traj_a=json.dumps(traj_a),
         traj_b=json.dumps(traj_b),
@@ -414,8 +405,7 @@ def round_submit(rnd):
     conf=float(request.form.get('confidence',50))
     aci=abs(alloc_pct-50)*2/100
     row=ALL_ROUNDS.get(sector,ALL_ROUNDS["Information Technology"])[rnd-1]
-    ga=row[3]; gb=row[6]
-    ra=ga/100; rb=gb/100
+    ra=row[3]/100; rb=row[6]/100
     alloc_b=1000-alloc_a
     actual=(alloc_a*ra)+(alloc_b*rb)
     rd=session.get('rd',{})
@@ -442,8 +432,7 @@ def trajectory(rnd):
     elif rnd==15: next_url=url_for('final_results')
     else: next_url=url_for('round_page',rnd=rnd+1)
     return render_template('trajectory.html',
-        rnd=rnd,sa=sa,sb=sb,
-        pa=pa,pb=pb,
+        rnd=rnd,sa=sa,sb=sb,pa=pa,pb=pb,
         change_a=change_a,change_b=change_b,
         traj_a=json.dumps(traj_a),
         traj_b=json.dumps(traj_b),
