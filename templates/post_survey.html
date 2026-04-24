@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>Final Questions</h2>
+  <p>Almost done. Please answer these final questions. Completely anonymous.</p>
+  <form method="POST" action="/post_survey">
+    <label>1. What is your age?</label>
+    <select name="age" required>
+      <option value="">— Select —</option>
+      <option>18-24</option><option>25-34</option><option>35-44</option>
+      <option>45-54</option><option>55-64</option><option>65 or older</option>
+    </select>
+    <label>2. What is your gender?</label>
+    <select name="gender" required>
+      <option value="">— Select —</option>
+      <option>Man</option><option>Woman</option><option>Non-binary</option>
+      <option>Prefer to self-describe</option><option>Prefer not to say</option>
+    </select>
+    <label>3. What is your highest level of education?</label>
+    <select name="education" required>
+      <option value="">— Select —</option>
+      <option>High school diploma</option><option>Some college</option>
+      <option>Bachelor degree</option><option>Master degree</option>
+      <option>PhD or higher</option><option>Other</option>
+    </select>
+    <label>4. How many years of investment experience do you have?</label>
+    <select name="experience" required>
+      <option value="">— Select —</option>
+      <option>No experience</option><option>Less than 1 year</option>
+      <option>1 to 3 years</option><option>3 to 5 years</option>
+      <option>More than 5 years</option>
+    </select>
+    <label>5. Have you ever used a robo-advisor or AI-based investment tool?</label>
+    <select name="robo_prior" required>
+      <option value="">— Select —</option>
+      <option>Yes</option><option>No</option><option>Not sure</option>
+    </select>
+    <label>6. The AI recommendation seemed to reflect knowledge of my
+      personal investment history and preferences.
+      <span style="font-weight:normal;color:var(--muted);">
+        (1 = Strongly disagree, 7 = Strongly agree)</span></label>
+    <div style="display:flex;justify-content:space-between;
+                font-size:13px;color:var(--muted);margin-bottom:8px;">
+      <span>1 — Strongly disagree</span><span>7 — Strongly agree</span>
+    </div>
+    <input type="range" name="manipulation_check" min="1" max="7" value="4"
+      style="width:100%;height:8px;cursor:pointer;accent-color:var(--blue);
+             margin-bottom:8px;"
+      oninput="document.getElementById('mcVal').textContent=this.value">
+    <div style="text-align:center;margin-bottom:20px;">
+      <span style="font-size:22px;font-weight:bold;color:var(--blue);"
+            id="mcVal">4</span><span style="color:var(--muted);"> / 7</span>
+    </div>
+    <label>7. Please describe in your own words how you made your
+      investment allocation decisions throughout this study.</label>
+    <textarea name="open_text" rows="5" required
+      placeholder="Please describe your decision-making process..."></textarea>
+    <button type="submit" class="btn btn-full">
+      Submit and Complete Study ✓
+    </button>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>All 15 Rounds Complete — Your Portfolio Results</h2>
+  <p>Here is your complete investment performance across all 15 rounds.</p>
+  <table style="width:100%;border-collapse:collapse;margin:20px 0;">
+    <thead>
+      <tr style="background:var(--navy);color:white;">
+        <th style="padding:12px 16px;text-align:left;">Measure</th>
+        <th style="padding:12px 16px;text-align:right;">Your Result</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:12px 16px;">Total portfolio return</td>
+        <td style="padding:12px 16px;text-align:right;font-weight:bold;font-size:18px;
+          color:{% if results.total_return >= 0 %}#0F6E56{% else %}#A32D2D{% endif %};">
+          ${{ "%.2f"|format(results.total_return) }}</td>
+      </tr>
+      <tr style="background:var(--gray);border-bottom:1px solid var(--border);">
+        <td style="padding:12px 16px;">Equal-split benchmark return</td>
+        <td style="padding:12px 16px;text-align:right;font-weight:bold;font-size:18px;">
+          ${{ "%.2f"|format(results.benchmark_return) }}</td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:12px 16px;">Performance vs benchmark</td>
+        <td style="padding:12px 16px;text-align:right;font-weight:bold;font-size:18px;
+          color:{% if results.portfolio_score >= 0 %}#0F6E56{% else %}#A32D2D{% endif %};">
+          {{ "+" if results.portfolio_score >= 0 else "" }}${{ "%.2f"|format(results.portfolio_score) }}</td>
+      </tr>
+      <tr style="background:var(--gray);border-bottom:1px solid var(--border);">
+        <td style="padding:12px 16px;">Accurate decisions</td>
+        <td style="padding:12px 16px;text-align:right;font-weight:bold;font-size:18px;">
+          {{ results.correct_rounds }} / 15</td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:12px 16px;">Average confidence</td>
+        <td style="padding:12px 16px;text-align:right;font-weight:bold;font-size:18px;">
+          {{ results.mean_confidence }}%</td>
+      </tr>
+      <tr style="background:var(--gray);border-bottom:1px solid var(--border);">
+        <td style="padding:12px 16px;">Average accuracy</td>
+        <td style="padding:12px 16px;text-align:right;font-weight:bold;font-size:18px;">
+          {{ results.mean_accuracy }}%</td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:12px 16px;">OCI Score</td>
+        <td style="padding:12px 16px;text-align:right;font-weight:bold;font-size:18px;
+          color:{% if results.oci > 10 %}#A32D2D{% elif results.oci < -10 %}var(--blue){% else %}#0F6E56{% endif %};">
+          {{ "+" if results.oci > 0 else "" }}{{ results.oci }}</td>
+      </tr>
+      <tr style="background:var(--gray);">
+        <td style="padding:12px 16px;">Mean ACI</td>
+        <td style="padding:12px 16px;text-align:right;font-weight:bold;font-size:18px;">
+          {{ results.mean_aci }}</td>
+      </tr>
+    </tbody>
+  </table>
+  <a href="/post_survey" class="btn btn-full">Continue to Final Questions →</a>
+</div>
+{% endblock %}

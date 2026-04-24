@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>Sector Selection</h2>
+  <p>
+    In order to keep the AI recommendations focused and relevant to your
+    interests, we would like to know your sector choice. You will see
+    stocks from your chosen sector throughout all 15 rounds.
+  </p>
+  <hr class="divider">
+
+  <form method="POST" action="/sector">
+    <label>Which investment sector do you find most interesting or
+      relevant to your personal investment approach?
+      Please select one.</label>
+
+    <select name="sector_choice" required>
+      <option value="">— Select one —</option>
+      <option value="Communication Services">
+        Communication Services (e.g., media, telecommunications, internet)
+      </option>
+      <option value="Consumer Discretionary">
+        Consumer Discretionary (e.g., retail, automotive, e-commerce)
+      </option>
+      <option value="Consumer Staples">
+        Consumer Staples (e.g., food, household products, supermarkets)
+      </option>
+      <option value="Energy">
+        Energy (e.g., oil, gas, renewable energy)
+      </option>
+      <option value="Financials">
+        Financials (e.g., banks, insurance, investment companies)
+      </option>
+      <option value="Health Care">
+        Health Care (e.g., pharmaceuticals, hospitals, medical devices)
+      </option>
+      <option value="Industrials">
+        Industrials (e.g., aerospace, manufacturing, transportation)
+      </option>
+      <option value="Information Technology">
+        Information Technology (e.g., software, semiconductors, hardware)
+      </option>
+      <option value="Materials">
+        Materials (e.g., chemicals, mining, packaging)
+      </option>
+      <option value="Real Estate">
+        Real Estate (e.g., property development, REITs)
+      </option>
+      <option value="Utilities">
+        Utilities (e.g., electric, gas, water utilities)
+      </option>
+    </select>
+
+    <button type="submit" class="btn btn-full">
+      Continue to Investment Profile →
+    </button>
+  </form>
+</div>
+{% endblock %}

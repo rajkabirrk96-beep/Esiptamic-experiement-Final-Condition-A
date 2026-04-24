@@ -1,0 +1,330 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% set pct = ((rnd - 1) / total_rounds * 100) | int %}
+{% set color_a = "#0F6E56" if "+" in change_a else "#A32D2D" %}
+{% set color_b = "#0F6E56" if "+" in change_b else "#A32D2D" %}
+
+<div class="progress-label">Round {{ rnd }} of {{ total_rounds }}</div>
+<div class="progress-bar">
+  <div class="progress-fill" style="width:{{ pct }}%"></div>
+</div>
+
+<!-- Phase indicator -->
+<div style="display:flex;gap:8px;margin-bottom:16px;align-items:center;">
+  {% for p in [1,2,3] %}
+  <div style="flex:1;height:5px;border-radius:99px;
+    background:{% if p <= phase %}var(--blue){% else %}var(--border){% endif %};"></div>
+  {% endfor %}
+  <span style="font-size:12px;color:var(--muted);white-space:nowrap;">
+    Phase {{ phase }} of 3
+  </span>
+</div>
+
+<div class="card">
+  <h2>Round {{ rnd }} of {{ total_rounds }} — {{ sector }}</h2>
+
+  <!-- Stock table -->
+  <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
+    <thead>
+      <tr style="background:var(--navy);color:white;">
+        <th style="padding:12px 16px;text-align:left;">Stock</th>
+        <th style="padding:12px 16px;text-align:right;">Today's Price</th>
+        <th style="padding:12px 16px;text-align:right;">6M Change</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:14px 16px;font-weight:bold;font-size:16px;">
+          <span style="display:inline-block;width:12px;height:12px;
+            background:#0F6E56;border-radius:50%;margin-right:8px;"></span>
+          Stock A — {{ sa }}
+        </td>
+        <td style="padding:14px 16px;text-align:right;font-size:16px;">
+          ${{ "%.2f"|format(pa) }}
+        </td>
+        <td style="padding:14px 16px;text-align:right;font-weight:bold;
+          font-size:16px;color:{{ color_a }};">{{ change_a }}</td>
+      </tr>
+      <tr style="background:var(--gray);">
+        <td style="padding:14px 16px;font-weight:bold;font-size:16px;">
+          <span style="display:inline-block;width:12px;height:12px;
+            background:#A32D2D;border-radius:50%;margin-right:8px;"></span>
+          Stock B — {{ sb }}
+        </td>
+        <td style="padding:14px 16px;text-align:right;font-size:16px;">
+          ${{ "%.2f"|format(pb) }}
+        </td>
+        <td style="padding:14px 16px;text-align:right;font-weight:bold;
+          font-size:16px;color:{{ color_b }};">{{ change_b }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- AI Recommendation — Condition A personalized -->
+  <div style="background:#E8EEFF;padding:20px;border-radius:10px;
+              border-left:4px solid var(--blue);">
+    <div style="font-weight:bold;color:var(--navy);margin-bottom:10px;
+                font-size:13px;text-transform:uppercase;letter-spacing:0.5px;">
+      🤖 AI Recommendation
+      <span style="font-size:11px;font-weight:normal;color:var(--blue);
+                   margin-left:8px;background:white;padding:2px 8px;
+                   border-radius:99px;">
+        Phase {{ phase }} —
+        {% if phase == 1 %}Profile based
+        {% elif phase == 2 %}Profile + History
+        {% else %}Full accumulated profile{% endif %}
+      </span>
+    </div>
+    <p style="color:var(--text);font-style:italic;margin-bottom:0;line-height:1.8;">
+      "{{ ai_text | safe }}"
+    </p>
+  </div>
+</div>
+
+<form method="POST" action="/round/{{ rnd }}/submit" id="roundForm">
+
+  <!-- STEP 1 — ALLOCATION — Dual Sync Input Fields — NO SLIDER -->
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+      <div class="step-circle green">1</div>
+      <h3 style="margin:0;">Allocate Your $1,000</h3>
+    </div>
+    <p>Enter the amount you want to invest in each stock.
+      The two fields are linked — they always add up to $1,000.</p>
+
+    <div style="display:flex;gap:16px;align-items:flex-end;margin-bottom:20px;">
+
+      <!-- Stock A input -->
+      <div style="flex:1;">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:6px;
+                    text-transform:uppercase;letter-spacing:0.5px;
+                    font-weight:bold;">
+          <span style="display:inline-block;width:10px;height:10px;
+            background:#0F6E56;border-radius:50%;margin-right:6px;"></span>
+          Stock A — {{ sa }}
+        </div>
+        <div style="display:flex;align-items:center;border:2px solid var(--blue);
+                    border-radius:8px;overflow:hidden;background:var(--light);">
+          <span style="padding:0 12px;font-size:20px;font-weight:bold;
+                       color:var(--blue);">$</span>
+          <input type="number" id="inputA" name="alloc_a"
+            min="0" max="1000" value="500" step="10"
+            style="border:none;background:transparent;font-size:22px;
+                   font-weight:bold;color:#0F6E56;padding:14px 12px 14px 0;
+                   width:100%;outline:none;"
+            oninput="syncA(this.value)">
+        </div>
+      </div>
+
+      <!-- Plus sign -->
+      <div style="font-size:28px;color:var(--muted);font-weight:bold;
+                  padding-bottom:14px;">+</div>
+
+      <!-- Stock B input -->
+      <div style="flex:1;">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:6px;
+                    text-transform:uppercase;letter-spacing:0.5px;
+                    font-weight:bold;">
+          <span style="display:inline-block;width:10px;height:10px;
+            background:#A32D2D;border-radius:50%;margin-right:6px;"></span>
+          Stock B — {{ sb }}
+        </div>
+        <div style="display:flex;align-items:center;border:2px solid var(--border);
+                    border-radius:8px;overflow:hidden;background:#FFF5F5;">
+          <span style="padding:0 12px;font-size:20px;font-weight:bold;
+                       color:var(--muted);">$</span>
+          <input type="number" id="inputB"
+            min="0" max="1000" value="500" step="10"
+            style="border:none;background:transparent;font-size:22px;
+                   font-weight:bold;color:#A32D2D;padding:14px 12px 14px 0;
+                   width:100%;outline:none;"
+            oninput="syncB(this.value)">
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Total display -->
+    <div id="totalDisplay"
+      style="text-align:center;padding:12px;background:var(--gray);
+             border-radius:8px;font-size:16px;color:var(--muted);">
+      Total: <strong style="color:var(--navy);font-size:20px;">$1,000</strong>
+      ✓
+    </div>
+
+    <!-- Visual allocation bar -->
+    <div style="margin-top:16px;">
+      <div style="display:flex;justify-content:space-between;
+                  font-size:12px;color:var(--muted);margin-bottom:4px;">
+        <span>{{ sa }}</span>
+        <span>{{ sb }}</span>
+      </div>
+      <div style="height:12px;border-radius:99px;overflow:hidden;
+                  background:var(--border);display:flex;">
+        <div id="barA"
+          style="width:50%;background:#0F6E56;
+                 transition:width 0.2s;border-radius:99px 0 0 99px;"></div>
+        <div id="barB"
+          style="width:50%;background:#A32D2D;
+                 transition:width 0.2s;border-radius:0 99px 99px 0;"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;
+                  font-size:12px;margin-top:4px;">
+        <span id="pctA" style="color:#0F6E56;font-weight:bold;">50%</span>
+        <span id="pctB" style="color:#A32D2D;font-weight:bold;">50%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2 — CONFIDENCE — AFTER allocation — no knob at start -->
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+      <div class="step-circle">2</div>
+      <h3 style="margin:0;">Confidence Measurement</h3>
+    </div>
+    <p>Now that you have made your allocation — how confident are you
+      that you identified the better investment opportunity this round?</p>
+
+    <!-- Custom slider with no initial knob -->
+    <div style="margin:20px 0;">
+      <div style="display:flex;justify-content:space-between;
+                  font-size:12px;color:var(--muted);margin-bottom:12px;">
+        <span>0</span><span>10</span><span>20</span><span>30</span>
+        <span>40</span><span>50</span><span>60</span><span>70</span>
+        <span>80</span><span>90</span><span>100</span>
+      </div>
+      <input type="range" id="confidence" name="confidence"
+        min="0" max="100" value=""
+        style="width:100%;height:10px;cursor:pointer;
+               accent-color:var(--blue);"
+        oninput="updateConf(this.value)"
+        onchange="updateConf(this.value)">
+      <div style="display:flex;justify-content:space-between;
+                  font-size:11px;color:var(--muted);margin-top:4px;">
+        <span>Not confident at all</span>
+        <span>Extremely confident</span>
+      </div>
+    </div>
+
+    <!-- Confidence display — hidden until slider is touched -->
+    <div id="confDisplay"
+      style="display:none;margin-top:16px;padding:16px;
+             background:var(--gray);border-radius:10px;text-align:center;">
+      <div style="font-size:13px;color:var(--muted);margin-bottom:6px;
+                  text-transform:uppercase;letter-spacing:1px;">
+        Your Confidence Level
+      </div>
+      <div style="display:flex;align-items:baseline;
+                  justify-content:center;gap:4px;">
+        <span id="confNum"
+          style="font-size:52px;font-weight:bold;color:var(--blue);
+                 line-height:1;">—</span>
+        <span id="confPct"
+          style="font-size:24px;font-weight:bold;color:var(--blue);">%</span>
+      </div>
+      <div id="confLabel"
+        style="font-size:14px;color:var(--muted);margin-top:6px;"></div>
+      <div style="margin-top:12px;background:var(--border);
+                  border-radius:99px;height:8px;overflow:hidden;">
+        <div id="confBar"
+          style="height:100%;width:0;background:var(--blue);
+                 border-radius:99px;transition:width 0.2s;"></div>
+      </div>
+    </div>
+
+    <div id="confWarning"
+      style="color:var(--red);font-size:13px;margin-top:8px;
+             display:none;">
+      Please move the slider to rate your confidence before submitting.
+    </div>
+  </div>
+
+  <button type="submit" class="btn btn-full" onclick="return validateForm()">
+    Submit Round {{ rnd }} — See Stock Movement →
+  </button>
+</form>
+
+<script>
+var confTouched = false;
+
+var confLabels = {
+  0:"No confidence at all",10:"Very low confidence",
+  20:"Low confidence",30:"Somewhat low confidence",
+  40:"Below average confidence",50:"Moderate confidence",
+  60:"Above average confidence",70:"Fairly confident",
+  80:"High confidence",90:"Very high confidence",
+  100:"Extremely confident"
+};
+
+function getLabel(v) {
+  var keys=Object.keys(confLabels).map(Number).sort(function(a,b){return a-b;});
+  for(var i=keys.length-1;i>=0;i--){
+    if(v>=keys[i]) return confLabels[keys[i]];
+  }
+  return confLabels[0];
+}
+
+function getColor(v) {
+  if(v<30) return '#A32D2D';
+  if(v<50) return '#BA7517';
+  if(v<70) return 'var(--blue)';
+  return '#0F6E56';
+}
+
+function updateConf(v) {
+  confTouched = true;
+  var n = parseInt(v);
+  var c = getColor(n);
+  document.getElementById('confDisplay').style.display = 'block';
+  document.getElementById('confWarning').style.display = 'none';
+  document.getElementById('confNum').textContent = n;
+  document.getElementById('confNum').style.color = c;
+  document.getElementById('confPct').style.color = c;
+  document.getElementById('confLabel').textContent = getLabel(n);
+  var bar = document.getElementById('confBar');
+  bar.style.width = n + '%';
+  bar.style.background = c;
+}
+
+function syncA(val) {
+  var a = parseInt(val) || 0;
+  a = Math.max(0, Math.min(1000, a));
+  var b = 1000 - a;
+  document.getElementById('inputA').value = a;
+  document.getElementById('inputB').value = b;
+  updateBars(a, b);
+}
+
+function syncB(val) {
+  var b = parseInt(val) || 0;
+  b = Math.max(0, Math.min(1000, b));
+  var a = 1000 - b;
+  document.getElementById('inputA').value = a;
+  document.getElementById('inputB').value = b;
+  updateBars(a, b);
+}
+
+function updateBars(a, b) {
+  var pctA = (a / 1000 * 100).toFixed(0);
+  var pctB = (b / 1000 * 100).toFixed(0);
+  document.getElementById('barA').style.width = pctA + '%';
+  document.getElementById('barB').style.width = pctB + '%';
+  document.getElementById('pctA').textContent = pctA + '%';
+  document.getElementById('pctB').textContent = pctB + '%';
+}
+
+function validateForm() {
+  if (!confTouched) {
+    document.getElementById('confWarning').style.display = 'block';
+    document.getElementById('confidence').scrollIntoView(
+      {behavior:'smooth'});
+    return false;
+  }
+  // Ensure alloc_a is set correctly
+  var a = parseInt(document.getElementById('inputA').value) || 500;
+  document.getElementById('inputA').value = Math.max(0, Math.min(1000, a));
+  return true;
+}
+</script>
+{% endblock %}

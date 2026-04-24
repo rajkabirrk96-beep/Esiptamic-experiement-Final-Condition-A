@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>Investment Profile — 3 Questions</h2>
+  <p>Please answer three short questions about your investment style.
+    There are no right or wrong answers. This takes about 1 minute.</p>
+  <hr class="divider">
+
+  <form method="POST" action="/prestudy">
+
+    <label>1. When you make an investment, how long do you typically
+      plan to hold it before making a new decision?</label>
+    <select name="hold_duration" required>
+      <option value="">— Select one —</option>
+      <option value="Less than 1 month">Less than 1 month</option>
+      <option value="1 to 3 months">1 to 3 months</option>
+      <option value="3 to 6 months">3 to 6 months</option>
+      <option value="6 to 12 months">6 to 12 months</option>
+      <option value="More than 1 year">More than 1 year</option>
+    </select>
+
+    <label>2. What is your primary investment goal over the
+      medium term — the next 1 to 3 years?</label>
+    <select name="investment_goal" required>
+      <option value="">— Select one —</option>
+      <option value="Capital preservation">
+        Capital preservation — protect my money from losing value
+      </option>
+      <option value="Steady growth">
+        Steady growth — grow my money gradually with low risk
+      </option>
+      <option value="High returns">
+        High returns — maximize growth even if it means higher risk
+      </option>
+      <option value="Income generation">
+        Income generation — earn regular returns from my investments
+      </option>
+    </select>
+
+    <label>3. If you were investing $1,000, how would you describe
+      your risk tolerance?</label>
+    <select name="risk_tolerance" required>
+      <option value="">— Select one —</option>
+      <option value="Very conservative">
+        Very conservative — I prefer to protect my money even if
+        returns are low
+      </option>
+      <option value="Somewhat conservative">
+        Somewhat conservative — I prefer mostly safe investments
+        with small potential gains
+      </option>
+      <option value="Moderate">
+        Moderate — I am comfortable balancing risk and return equally
+      </option>
+      <option value="Somewhat aggressive">
+        Somewhat aggressive — I am willing to accept higher risk for
+        potentially higher returns
+      </option>
+      <option value="Very aggressive">
+        Very aggressive — I seek maximum returns and am comfortable
+        with significant risk
+      </option>
+    </select>
+
+    <button type="submit" class="btn btn-full">
+      Begin Round 1 of 15 →
+    </button>
+  </form>
+</div>
+{% endblock %}

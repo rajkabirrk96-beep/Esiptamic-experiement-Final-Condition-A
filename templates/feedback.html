@@ -1,0 +1,245 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>Investment Summary — Rounds {{ start_r }} to {{ end_r }}</h2>
+  <p>You have completed <strong>{{ end_r }} of 15</strong> rounds.
+    Here is your investment performance dashboard.</p>
+
+  <!-- Time period selector -->
+  <div style="display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap;">
+    {% for period in ['1D','1W','1M','3M','6M','1Y','ALL'] %}
+    <button onclick="showPeriod('{{ period }}')" id="btn_{{ period }}"
+      style="padding:6px 14px;border:1px solid var(--border);border-radius:6px;
+             font-size:13px;font-weight:bold;cursor:pointer;
+             background:{% if period=='ALL' %}var(--navy){% else %}white{% endif %};
+             color:{% if period=='ALL' %}white{% else %}var(--muted){% endif %};">
+      {{ period }}
+    </button>
+    {% endfor %}
+  </div>
+
+  <!-- Chart -->
+  <div style="background:var(--gray);border-radius:12px;padding:20px;
+              margin-bottom:24px;position:relative;">
+    <div id="chartLabel"
+      style="position:absolute;top:12px;left:20px;font-size:11px;
+             color:var(--muted);font-weight:bold;text-transform:uppercase;
+             letter-spacing:1px;">
+      Allocation & Confidence — All Rounds
+    </div>
+    <canvas id="perfChart" width="700" height="240"
+      style="width:100%;height:240px;"></canvas>
+  </div>
+
+  <!-- Three metrics -->
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;
+              gap:12px;margin-bottom:20px;">
+    <div style="background:white;border-radius:10px;padding:16px;
+                border:1px solid var(--border);text-align:center;">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:4px;
+                  text-transform:uppercase;letter-spacing:0.8px;">
+        Avg Stock A</div>
+      <div style="font-size:30px;font-weight:bold;color:#0F6E56;">
+        ${{ summary.avg_a }}</div>
+      <div style="font-size:11px;color:var(--muted);">per round</div>
+    </div>
+    <div style="background:white;border-radius:10px;padding:16px;
+                border:1px solid var(--border);text-align:center;">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:4px;
+                  text-transform:uppercase;letter-spacing:0.8px;">
+        Avg Stock B</div>
+      <div style="font-size:30px;font-weight:bold;color:#A32D2D;">
+        ${{ summary.avg_b }}</div>
+      <div style="font-size:11px;color:var(--muted);">per round</div>
+    </div>
+    <div style="background:white;border-radius:10px;padding:16px;
+                border:1px solid var(--border);text-align:center;">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:4px;
+                  text-transform:uppercase;letter-spacing:0.8px;">
+        Avg ACI</div>
+      <div style="font-size:30px;font-weight:bold;color:var(--amber);">
+        {{ summary.avg_aci }}</div>
+      <div style="font-size:11px;color:var(--muted);">concentration index</div>
+    </div>
+  </div>
+
+  <!-- Confidence bar -->
+  <div style="background:white;border-radius:10px;padding:20px;
+              border:1px solid var(--border);margin-bottom:20px;">
+    <div style="display:flex;justify-content:space-between;
+                align-items:center;margin-bottom:10px;">
+      <div>
+        <div style="font-size:11px;color:var(--muted);
+                    text-transform:uppercase;letter-spacing:0.8px;">
+          Average Confidence Level</div>
+        <div style="font-size:30px;font-weight:bold;color:var(--blue);">
+          {{ summary.avg_conf }}%</div>
+      </div>
+    </div>
+    <div style="background:var(--border);border-radius:99px;
+                height:10px;overflow:hidden;">
+      <div style="height:100%;width:{{ summary.avg_conf }}%;
+                  background:linear-gradient(90deg,var(--blue),#0F6E56);
+                  border-radius:99px;"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;
+                margin-top:4px;font-size:11px;color:var(--muted);">
+      <span>Not confident</span><span>Extremely confident</span>
+    </div>
+  </div>
+
+  <!-- Per-round table -->
+  <div style="overflow-x:auto;margin-bottom:24px;">
+    <table style="width:100%;border-collapse:collapse;font-size:13px;">
+      <thead>
+        <tr style="background:var(--navy);color:white;">
+          <th style="padding:10px 12px;text-align:left;">Round</th>
+          <th style="padding:10px 12px;text-align:right;">Stock A ($)</th>
+          <th style="padding:10px 12px;text-align:right;">Stock B ($)</th>
+          <th style="padding:10px 12px;text-align:right;">Confidence</th>
+          <th style="padding:10px 12px;text-align:right;">ACI</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in summary.rounds %}
+        <tr style="border-bottom:1px solid var(--border);
+          {% if loop.index is even %}background:var(--gray);{% endif %}">
+          <td style="padding:10px 12px;font-weight:bold;color:var(--navy);">
+            Round {{ r.round }}</td>
+          <td style="padding:10px 12px;text-align:right;
+                     color:#0F6E56;font-weight:bold;">${{ r.alloc_a }}</td>
+          <td style="padding:10px 12px;text-align:right;
+                     color:#A32D2D;font-weight:bold;">${{ r.alloc_b }}</td>
+          <td style="padding:10px 12px;text-align:right;">{{ r.conf }}%</td>
+          <td style="padding:10px 12px;text-align:right;
+                     color:var(--amber);font-weight:bold;">{{ r.aci }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Condition A personalized AI update -->
+  <div style="background:#E8EEFF;padding:20px;border-radius:10px;
+              border-left:4px solid var(--blue);margin-bottom:24px;">
+    <div style="font-weight:bold;color:var(--navy);margin-bottom:10px;">
+      🤖 Your AI Profile — Phase {{ phase + 1 }} Update
+    </div>
+    <p style="color:var(--text);margin-bottom:0;line-height:1.8;
+              font-style:italic;">
+      "Based on your <strong>{{ goal }}</strong> investment goal,
+      your <strong>{{ risk }}</strong> risk preference,
+      your <strong>{{ hold }}</strong> hold duration, and your recent
+      investment pattern in the <strong>{{ sector }}</strong> sector —
+      averaging <strong>${{ summary.avg_a }}</strong> toward Stock A and
+      <strong>${{ summary.avg_b }}</strong> toward Stock B with
+      <strong>{{ summary.avg_conf }}%</strong> average confidence —
+      your investment profile has been updated for Phase {{ phase + 1 }}."
+    </p>
+  </div>
+
+  <div style="text-align:center;">
+    <p style="color:var(--muted);font-size:14px;margin-bottom:16px;">
+      {% if phase == 1 %}Phase 2 begins — 10 rounds remaining.
+      {% else %}Phase 3 begins — 5 rounds remaining.{% endif %}
+    </p>
+    <a href="/round/{{ next_round }}" class="btn btn-full">
+      Begin Phase {{ phase + 1 }} — Round {{ next_round }} →
+    </a>
+  </div>
+</div>
+
+<script>
+var roundData = {{ summary.chart_data | tojson }};
+var periods = {'1D':1,'1W':2,'1M':3,'3M':4,'6M':5,'1Y':6,'ALL':roundData.length};
+
+function showPeriod(p) {
+  ['1D','1W','1M','3M','6M','1Y','ALL'].forEach(function(x) {
+    var btn=document.getElementById('btn_'+x);
+    if(btn){btn.style.background=x===p?'var(--navy)':'white';
+            btn.style.color=x===p?'white':'var(--muted)';}
+  });
+  drawChart(p);
+  document.getElementById('chartLabel').textContent=
+    'Allocation & Confidence — '+p;
+}
+
+function drawChart(period) {
+  var canvas=document.getElementById('perfChart');
+  if(!canvas) return;
+  var ctx=canvas.getContext('2d');
+  var W=canvas.width,H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+  var n=Math.min(periods[period]||roundData.length,roundData.length);
+  var data=roundData.slice(roundData.length-n);
+  if(!data.length) return;
+  var pad={top:30,right:20,bottom:50,left:55};
+  var cW=W-pad.left-pad.right,cH=H-pad.top-pad.bottom;
+
+  // Grid
+  ctx.strokeStyle='#E2E8F0';ctx.lineWidth=1;
+  for(var i=0;i<=4;i++){
+    var y=pad.top+(cH/4)*i;
+    ctx.beginPath();ctx.moveTo(pad.left,y);ctx.lineTo(W-pad.right,y);ctx.stroke();
+    ctx.fillStyle='#94A3B8';ctx.font='10px Arial';ctx.textAlign='right';
+    ctx.fillText('$'+Math.round(1000-(i/4)*1000),pad.left-6,y+4);
+  }
+
+  // Y axis label
+  ctx.save();ctx.translate(14,pad.top+cH/2);ctx.rotate(-Math.PI/2);
+  ctx.fillStyle='#64748B';ctx.font='bold 10px Arial';ctx.textAlign='center';
+  ctx.fillText('Allocation ($)',0,0);ctx.restore();
+
+  // X axis label
+  ctx.fillStyle='#64748B';ctx.font='bold 10px Arial';ctx.textAlign='center';
+  ctx.fillText('Investment Round',pad.left+cW/2,H-8);
+
+  var gap=cW/data.length;
+  var bW=gap*0.32;
+
+  data.forEach(function(d,i){
+    var x=pad.left+i*gap+gap*0.13;
+    // Stock A bar
+    var hA=(d.alloc_a/1000)*cH;
+    ctx.fillStyle='rgba(15,110,86,0.85)';
+    ctx.fillRect(x,pad.top+cH-hA,bW,hA);
+    // Stock B bar
+    var hB=(d.alloc_b/1000)*cH;
+    ctx.fillStyle='rgba(163,45,45,0.85)';
+    ctx.fillRect(x+bW+2,pad.top+cH-hB,bW,hB);
+    // Round label on X axis
+    ctx.fillStyle='#94A3B8';ctx.font='10px Arial';ctx.textAlign='center';
+    ctx.fillText('R'+d.round,x+bW,pad.top+cH+16);
+  });
+
+  // Confidence line
+  ctx.beginPath();ctx.strokeStyle='rgba(46,80,144,0.9)';ctx.lineWidth=2.5;
+  data.forEach(function(d,i){
+    var x=pad.left+i*gap+gap*0.5;
+    var y=pad.top+cH-(d.conf/100)*cH;
+    if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+
+  // Confidence dots
+  data.forEach(function(d,i){
+    var x=pad.left+i*gap+gap*0.5;
+    var y=pad.top+cH-(d.conf/100)*cH;
+    ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);
+    ctx.fillStyle='#2E5090';ctx.fill();
+    ctx.strokeStyle='white';ctx.lineWidth=1.5;ctx.stroke();
+  });
+
+  // Legend
+  ctx.fillStyle='rgba(15,110,86,0.85)';ctx.fillRect(pad.left,8,12,12);
+  ctx.fillStyle='#555';ctx.font='10px Arial';ctx.textAlign='left';
+  ctx.fillText('Stock A',pad.left+16,19);
+  ctx.fillStyle='rgba(163,45,45,0.85)';ctx.fillRect(pad.left+65,8,12,12);
+  ctx.fillStyle='#555';ctx.fillText('Stock B',pad.left+81,19);
+  ctx.strokeStyle='rgba(46,80,144,0.9)';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(pad.left+140,14);ctx.lineTo(pad.left+152,14);ctx.stroke();
+  ctx.fillStyle='#555';ctx.fillText('Confidence',pad.left+156,19);
+}
+window.addEventListener('load',function(){drawChart('ALL');});
+</script>
+{% endblock %}

@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% set color_a = "#0F6E56" if "+" in change_a else "#A32D2D" %}
+{% set color_b = "#0F6E56" if "+" in change_b else "#A32D2D" %}
+
+<div class="card">
+  <h2>Round {{ rnd }} — Stock Price Movement</h2>
+  <p>These charts show the actual 6-month price movement for each stock.
+    Review before continuing to the next round.</p>
+
+  <div style="display:flex;gap:20px;flex-wrap:wrap;">
+
+    <!-- Stock A Chart -->
+    <div style="flex:1;min-width:300px;background:var(--gray);
+                border-radius:10px;padding:20px;border:1px solid var(--border);">
+      <div style="display:flex;justify-content:space-between;
+                  align-items:center;margin-bottom:16px;">
+        <div>
+          <div style="font-weight:bold;color:var(--navy);font-size:15px;">
+            {{ sa }}
+          </div>
+          <div style="font-size:13px;color:var(--muted);">
+            Today's Price: <strong>${{ "%.2f"|format(pa) }}</strong>
+          </div>
+        </div>
+        <div style="font-size:20px;font-weight:bold;color:{{ color_a }};">
+          {{ change_a }}
+        </div>
+      </div>
+      <canvas id="chartA" width="320" height="200"
+        style="width:100%;background:white;border-radius:8px;
+               border:1px solid var(--border);display:block;"></canvas>
+    </div>
+
+    <!-- Stock B Chart -->
+    <div style="flex:1;min-width:300px;background:var(--gray);
+                border-radius:10px;padding:20px;border:1px solid var(--border);">
+      <div style="display:flex;justify-content:space-between;
+                  align-items:center;margin-bottom:16px;">
+        <div>
+          <div style="font-weight:bold;color:var(--navy);font-size:15px;">
+            {{ sb }}
+          </div>
+          <div style="font-size:13px;color:var(--muted);">
+            Today's Price: <strong>${{ "%.2f"|format(pb) }}</strong>
+          </div>
+        </div>
+        <div style="font-size:20px;font-weight:bold;color:{{ color_b }};">
+          {{ change_b }}
+        </div>
+      </div>
+      <canvas id="chartB" width="320" height="200"
+        style="width:100%;background:white;border-radius:8px;
+               border:1px solid var(--border);display:block;"></canvas>
+    </div>
+
+  </div>
+
+  <div style="margin-top:24px;">
+    <a href="{{ next_url }}" class="btn btn-full">
+      {% if rnd == 15 %}View Final Results →
+      {% elif rnd == 5 or rnd == 10 %}View Investment Summary →
+      {% else %}Continue to Round {{ rnd + 1 }} →{% endif %}
+    </a>
+  </div>
+</div>
+
+<script>
+var trajA = {{ traj_a | safe }};
+var trajB = {{ traj_b | safe }};
+
+function drawStockChart(canvasId, prices, color, stockName) {
+  var canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+
+  // Padding for axes
+  var pad = {top:20, right:20, bottom:50, left:65};
+  var chartW = W - pad.left - pad.right;
+  var chartH = H - pad.top - pad.bottom;
+
+  ctx.clearRect(0,0,W,H);
+
+  // Background
+  ctx.fillStyle = 'white';
+  ctx.fillRect(0,0,W,H);
+
+  var minP = Math.min.apply(null, prices);
+  var maxP = Math.max.apply(null, prices);
+  var range = maxP - minP;
+  var padding = range * 0.1 || 1;
+  minP -= padding; maxP += padding;
+
+  // Grid lines
+  ctx.strokeStyle = '#E2E8F0';
+  ctx.lineWidth = 1;
+  var ySteps = 5;
+  for (var i = 0; i <= ySteps; i++) {
+    var y = pad.top + (chartH / ySteps) * i;
+    ctx.beginPath();
+    ctx.moveTo(pad.left, y);
+    ctx.lineTo(W - pad.right, y);
+    ctx.stroke();
+  }
+
+  // ── Y AXIS LABEL ──────────────────────────────────────────
+  ctx.save();
+  ctx.translate(14, pad.top + chartH/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.fillStyle = '#64748B';
+  ctx.font = 'bold 11px Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText('Price (USD)', 0, 0);
+  ctx.restore();
+
+  // Y axis tick values
+  ctx.fillStyle = '#64748B';
+  ctx.font = '10px Arial';
+  ctx.textAlign = 'right';
+  for (var i = 0; i <= ySteps; i++) {
+    var val = maxP - (i / ySteps) * (maxP - minP);
+    var y = pad.top + (chartH / ySteps) * i;
+    ctx.fillText('$' + val.toFixed(0), pad.left - 8, y + 4);
+  }
+
+  // ── X AXIS LABEL ──────────────────────────────────────────
+  ctx.fillStyle = '#64748B';
+  ctx.font = 'bold 11px Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText('Trading Days (6 Months)', pad.left + chartW/2, H - 8);
+
+  // X axis tick labels — months
+  var monthLabels = ['M1','M2','M3','M4','M5','M6'];
+  ctx.font = '10px Arial';
+  ctx.fillStyle = '#94A3B8';
+  for (var m = 0; m < 6; m++) {
+    var x = pad.left + ((m + 0.5) / 6) * chartW;
+    ctx.fillText(monthLabels[m], x, H - 26);
+    // Vertical month divider
+    ctx.strokeStyle = '#F0F4FB';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(pad.left + ((m+1)/6)*chartW, pad.top);
+    ctx.lineTo(pad.left + ((m+1)/6)*chartW, pad.top + chartH);
+    ctx.stroke();
+  }
+
+  // Draw axes
+  ctx.strokeStyle = '#CBD5E1';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(pad.left, pad.top);
+  ctx.lineTo(pad.left, pad.top + chartH);
+  ctx.lineTo(pad.left + chartW, pad.top + chartH);
+  ctx.stroke();
+
+  // Price line
+  ctx.beginPath();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
+  prices.forEach(function(p, i) {
+    var x = pad.left + (i / (prices.length-1)) * chartW;
+    var y = pad.top + ((maxP - p) / (maxP - minP)) * chartH;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // Fill under line
+  ctx.beginPath();
+  prices.forEach(function(p, i) {
+    var x = pad.left + (i / (prices.length-1)) * chartW;
+    var y = pad.top + ((maxP - p) / (maxP - minP)) * chartH;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+  ctx.lineTo(pad.left + chartW, pad.top + chartH);
+  ctx.lineTo(pad.left, pad.top + chartH);
+  ctx.closePath();
+  ctx.fillStyle = color.replace(')', ',0.08)').replace('rgb','rgba').replace('#','rgba(').replace(
+    'rgba(0F6E56', 'rgba(15,110,86').replace('rgba(A32D2D','rgba(163,45,45');
+  // Simple fill approach
+  if (color === '#0F6E56') ctx.fillStyle = 'rgba(15,110,86,0.08)';
+  else ctx.fillStyle = 'rgba(163,45,45,0.08)';
+  ctx.fill();
+
+  // Start and end dots
+  [[0, prices[0]], [prices.length-1, prices[prices.length-1]]].forEach(function(pair) {
+    var i=pair[0], p=pair[1];
+    var x = pad.left + (i / (prices.length-1)) * chartW;
+    var y = pad.top + ((maxP - p) / (maxP - minP)) * chartH;
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, Math.PI*2);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.strokeStyle = 'white';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  });
+}
+
+window.addEventListener('load', function() {
+  drawStockChart('chartA', trajA, '#0F6E56', '{{ sa }}');
+  drawStockChart('chartB', trajB, '#A32D2D', '{{ sb }}');
+});
+</script>
+{% endblock %}
